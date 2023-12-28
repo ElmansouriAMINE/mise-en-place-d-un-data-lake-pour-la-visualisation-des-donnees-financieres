@@ -39,14 +39,14 @@ Analyzing New York Times sentiment data by truncating abstracts, calculating the
 ### Clone the Repository
 ```bash
 # Clone the repository from GitHub
-git clone https://github.com/ElmansouriAMINE/mise-en-place-d-un-data-lake-master.git
+git clone https://github.com/ElmansouriAMINE/mise-en-place-d-un-data-lake-pour-la-visualisation-des-donnees-financieres.git
 
-cd mise-en-place-d-un-data-lake-master
+cd mise-en-place-d-un-data-lake-pour-la-visualisation-des-donnees-financieres
 ```
 ### Start the Project with Docker Compose
 ```bash
 # Make sure to be in the project directory
-cd mise-en-place-d-un-data-lake-master
+cd mise-en-place-d-un-data-lake-pour-la-visualisation-des-donnees-financieres
 
 # Start the services in the background with Docker Compose
 docker-compose up -d
