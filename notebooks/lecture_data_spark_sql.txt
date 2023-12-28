@@ -1,0 +1,429 @@
+%pyspark
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("SentimentAnalysis").getOrCreate()
+
+
+%pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("parquetReading").getOrCreate()
+
+# Define the path to Parquet files in HDFS
+nyt_path = "hdfs://namenode:9000/user/inputs/nyt-00000-of-00001.parquet"
+yahoo_path = "hdfs://namenode:9000/user/inputs/yh-00000-of-00001.parquet"
+
+# Read Parquet files into DataFrames
+nyt_df = spark.read.parquet(nyt_path)
+
+# Rename columns with invalid characters using aliases
+nyt_df = nyt_df.select(
+    col("abstract"),
+    col("snippet"),
+    col("lead_paragraph"),
+    col("source"),
+    col("pub_date"),
+    col("document_type"),
+    col("section_name"),
+    col("type_of_material"),
+    col("uri"),
+)
+
+# Register DataFrames as temporary tables
+nyt_df.createOrReplaceTempView("nyt_data")
+
+# Read Yahoo Finance Parquet file
+yahoo_df = spark.read.parquet(yahoo_path)
+
+# Rename columns with invalid characters using aliases
+yahoo_df = yahoo_df.select(
+    col("Date"),
+    col("Open"),
+    col("High"),
+    col("Low"),
+    col("Close"),
+    col("Volume")
+)
+
+# Register DataFrame as a temporary table
+yahoo_df.createOrReplaceTempView("yahoo_data")
+
+# Perform Spark SQL queries to analyze or transform the data
+result_nyt = spark.sql("""
+    SELECT *
+    FROM nyt_data
+""")
+
+result_yahoo = spark.sql("""
+    SELECT *
+    FROM yahoo_data
+""")
+
+# Display the results
+result_nyt.show()
+result_yahoo.show()
+
+
+# spark.stop()
+
+
+
+
+%pyspark
+from pyspark.ml import PipelineModel
+hdfs_model_path = "hdfs://namenode:9000/user/best_model"
+loaded_model = PipelineModel.load(hdfs_model_path)
+
+
+
+
+%pyspark
+from pyspark.sql import SparkSession
+from pyspark.ml import PipelineModel
+from pyspark.sql.functions import col, udf, length, when
+from pyspark.sql.types import StringType
+
+# Assuming SparkSession is already created
+# If not, create it using SparkSession.builder.appName("YourAppName").getOrCreate()
+
+# Select the relevant column for prediction
+text_column = "abstract"
+nyt_text_data = result_nyt.select(col(text_column).alias("Sentence"))
+
+# Define a UDF to map sentiment labels
+map_sentiment_label_udf = udf(lambda prediction: 'positive' if prediction == 0.0 else ('negative' if prediction == 1.0 else 'neutral'), StringType())
+
+# Apply the loaded model to predict sentiment scores
+nyt_sentiment_result = loaded_model.transform(nyt_text_data)
+
+# Filter out rows where "Sentence" is not null
+nyt_sentiment_result = nyt_sentiment_result.filter(col("Sentence").isNotNull())
+
+
+# Extract the first 7 words of each sentence
+nyt_sentiment_result = nyt_sentiment_result.withColumn("Truncated_Sentence", when((length("Sentence") > 157) & (col("Sentence") != "") , col("Sentence").substr(1, 17) + "...").otherwise(col("Sentence")))
+
+
+# Select relevant columns for display
+nyt_sentiment_result = nyt_sentiment_result.select("Truncated_Sentence", "prediction") \
+    .withColumnRenamed("prediction", "Sentiment")
+
+# Apply the UDF to create a new column with sentiment labels
+nyt_sentiment_result = nyt_sentiment_result.withColumn("Sentiment_Label", map_sentiment_label_udf(col("Sentiment")))
+
+
+# Show the truncated results
+nyt_sentiment_result.select("Truncated_Sentence", "Sentiment", "Sentiment_Label").limit(7).show(truncate=False)
+
+
+
+
+
+%pyspark
+from pyspark.sql import SparkSession
+from pyspark.ml import PipelineModel
+from pyspark.sql.functions import col, udf
+from pyspark.sql.types import StringType
+
+# Assuming loaded_model is already loaded
+
+# Select the relevant column for prediction
+text_column = "abstract"
+result_nyt_text_data = result_nyt.select(col(text_column).alias("Sentence"))
+
+# Define a UDF to map sentiment labels
+map_sentiment_label_udf = udf(lambda prediction: 'positive' if prediction == 0.0 else ('negative' if prediction == 1.0 else 'neutral'), StringType())
+
+# Apply the loaded model to predict sentiment scores
+result_nyt_sentiment = loaded_model.transform(result_nyt_text_data)
+
+# Select relevant columns for display
+result_nyt_sentiment = result_nyt_sentiment.select("Sentence", "prediction").withColumnRenamed("prediction", "Sentiment")
+
+# Apply the UDF to create a new column with sentiment labels
+result_nyt_sentiment = result_nyt_sentiment.withColumn("Sentiment_Label", map_sentiment_label_udf(col("Sentiment")))
+
+
+%pyspark
+from pyspark.ml import PipelineModel
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, udf, avg, sum
+from pyspark.sql.types import IntegerType
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("SentimentAnalysis").getOrCreate()
+
+# Load the pre-trained sentiment analysis model
+loaded_model_path = "hdfs://namenode:9000/user/best_model" 
+loaded_model = PipelineModel.load(loaded_model_path)
+
+# Select the relevant column for prediction
+text_column = "abstract"
+result_nyt_text_data = result_nyt.select(col(text_column).alias("Sentence"), "pub_date")
+
+# Apply the loaded model to predict sentiment scores
+result_nyt_sentiment = loaded_model.transform(result_nyt_text_data)
+
+# Define a UDF to map sentiment labels
+map_sentiment_label_udf = udf(lambda prediction: 1 if prediction == 0.0 else (-1 if prediction == 1.0 else 0), IntegerType())
+
+# Apply the UDF to create a new column with sentiment labels
+result_nyt_sentiment = result_nyt_sentiment.withColumn("Sentiment_Label", map_sentiment_label_udf(col("prediction")))
+
+# Calculate the average sentiment, numPositv, and numNegative for each day
+result_nyt_avg_sentiment = result_nyt_sentiment.groupBy("pub_date").agg(
+    avg("Sentiment_Label").alias("AVGsentiment"),
+    sum(col("Sentiment_Label").cast(IntegerType())).alias("numPositv"),
+    sum((col("Sentiment_Label") * -1).cast(IntegerType())).alias("numNegative")
+)
+
+# Show the results
+# result_nyt_avg_sentiment.show(truncate=False)
+
+# Stop the Spark session
+# spark.stop()
+
+
+
+%pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, udf, length, when, date_format, sum ,format_number,count
+from pyspark.sql.types import StringType
+
+# Assuming SparkSession is already created
+# If not, create it using SparkSession.builder.appName("YourAppName").getOrCreate()
+
+# Define a UDF to map sentiment labels
+map_sentiment_label_udf = udf(lambda prediction: 'positive' if prediction == 0.0 else ('negative' if prediction == 1.0 else 'neutral'), StringType())
+
+# Assuming you have a DataFrame with sentiment labels named result_nyt_sentiment
+
+# Extract the first 7 words of each sentence
+result_nyt_sentiment = result_nyt_sentiment.withColumn("Truncated_Sentence", when((length("Sentence") > 107) & (col("Sentence") != ""), col("Sentence").substr(1, 7) + "...").otherwise(col("Sentence")))
+
+# Calculate the total number of sentences for each day
+result_nyt_count_sentences = result_nyt_sentiment.groupBy(date_format("pub_date", "yyyy-MM-dd").alias("pub_date"), "Truncated_Sentence").agg(count("*").alias("TotalSentences"))
+
+# Add Truncated_Sentence column to result_nyt_avg_sentiment DataFrame
+result_nyt_avg_sentiment = result_nyt_sentiment.groupBy(date_format("pub_date", "yyyy-MM-dd").alias("pub_date"), "Truncated_Sentence").agg(
+    avg("Sentiment_Label").alias("AVGsentiment"),
+    sum(when(col("Sentiment_Label") == 1, 1).otherwise(0)).alias("numPositv"),
+    sum(when(col("Sentiment_Label") == 0, 1).otherwise(0)).alias("numNegative")
+)
+
+# Join the average sentiment DataFrame with the total count DataFrame
+result_nyt_final = result_nyt_avg_sentiment.join(
+    result_nyt_count_sentences,
+    ["pub_date", "Truncated_Sentence"],
+    "left_outer"
+).select(
+    "pub_date",
+    "Truncated_Sentence",
+    "AVGsentiment",
+    "TotalSentences",
+    "numPositv",
+    "numNegative"
+)
+
+result_nyt_summary = result_nyt_sentiment.groupBy(date_format("pub_date", "yyyy-MM-dd").alias("pub_date")).agg(
+    count("*").alias("TotalSentences"),
+    sum(when(col("Sentiment_Label") == 1, 1).otherwise(0)).alias("numPositv"),
+    sum(when(col("Sentiment_Label") == 0, 1).otherwise(0)).alias("numNegative"),
+    sum(when((col("Sentiment_Label") != 0.0) & (col("Sentiment_Label") != 1.0), 1).otherwise(0)).alias("numNeutral"),
+   
+)
+# Calculate the average sentiment
+result_nyt_summary = result_nyt_summary.withColumn(
+    "AVGsentiment",
+    format_number((col("numNegative") + col("numPositv")) / col("TotalSentences"),2)
+)
+
+# Sort the DataFrame by date
+result_nyt_summary = result_nyt_summary.orderBy("pub_date")
+
+# Show the results
+result_nyt_summary.show(truncate=False)
+
+
+
+
+
+
+%pyspark
+# Add the provided data to result_nyt
+# additional_data = spark.sql("""
+#     SELECT *
+#     FROM nyt_data
+# """)
+
+additional_data = spark.sql("""
+    SELECT abstract,snippet,lead_paragraph,source,date_format(pub_date, 'yyyy-MM-dd') as pub_date,document_type,section_name,uri
+    FROM nyt_data
+""")
+
+
+
+# # Show the results
+# additional_data.show(truncate=False)
+
+
+# Join based on "pub_date" only
+result_nyt_final_with_additional_data = result_nyt_summary.join(
+    additional_data.select("pub_date", "abstract", "snippet", "lead_paragraph", "source", "document_type", "section_name", "uri"),
+    "pub_date",
+    "left_outer"
+)
+
+# Show the results
+result_nyt_final_with_additional_data.show(truncate=True)
+hdfs_path_csv = "hdfs://namenode:9000/user/nvDataFrame.csv"
+# hdfs_path_csv = "/opt/zeppelin/nvDataFrame2.csv"
+# Save DataFrame to HDFS in CSV format
+result_nyt_final_with_additional_data_grouped.write.csv(hdfs_path_csv, mode="overwrite", header=True)
+
+
+
+
+%pyspark
+from pyspark.sql.functions import first
+
+# Group by pub_date and select the first value for each group
+result_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy("pub_date").agg(
+    first("TotalSentences").alias("TotalSentences"),
+    first("numPositv").alias("numPositv"),
+    first("numNegative").alias("numNegative"),
+    first("numNeutral").alias("numNeutral"),
+    first("AVGsentiment").alias("AVGsentiment"),
+    first("abstract").alias("abstract"),
+    first("snippet").alias("snippet"),
+    first("lead_paragraph").alias("lead_paragraph"),
+    first("source").alias("source"),
+    first("document_type").alias("document_type"),
+    first("section_name").alias("section_name"),
+    first("uri").alias("uri")
+)
+
+# Show the results
+result_nyt_final_with_additional_data_grouped.show(truncate=True)
+# Specify the Druid configuration
+# druid_config = {
+#     "url": "http://broker:8076",  # Use the correct Druid broker URL (hostname may vary based on your setup)
+#     "dataSource": "mydata_source",  # Provide a Druid data source name
+#     # Other Druid configurations as needed
+# }
+
+
+# # Write DataFrame to Druid
+# # Write DataFrame to Druid
+# result_nyt_final_with_additional_data_grouped.write \
+#     .option("zkurl", "zookeeper2:2182") \
+#     .option("uris", "http://broker:8076") \
+#     .options(**druid_config) \
+#     .save()
+
+# Specify the HDFS path where you want to save the CSV file
+hdfs_path_csv = "hdfs://namenode:9000/user/result.csv"
+
+# Save DataFrame to HDFS in CSV format
+result_nyt_final_with_additional_data_grouped.write.csv(hdfs_path_csv, mode="overwrite", header=True)
+
+
+
+
+%pyspark
+from pyspark.sql.functions import first, collect_list
+
+# Group by pub_date and select the first value for each group
+result_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy("pub_date").agg(
+    first("TotalSentences").alias("TotalSentences"),
+    first("numPositv").alias("numPositv"),
+    first("numNegative").alias("numNegative"),
+    first("numNeutral").alias("numNeutral"),
+    first("AVGsentiment").alias("AVGsentiment"),
+    collect_list("abstract").alias("abstract"),
+    collect_list("snippet").alias("snippet"),
+    collect_list("lead_paragraph").alias("lead_paragraph"),
+    collect_list("source").alias("source"),
+    collect_list("document_type").alias("document_type"),
+    collect_list("section_name").alias("section_name"),
+    collect_list("uri").alias("uri")
+)
+
+# Show the results
+# result_nyt_final_with_additional_data_grouped.show(truncate=True)
+result_nyt_final_with_additional_data_grouped.limit(3).show(truncate=True)
+
+
+
+
+%pyspark
+from pyspark.sql.functions import first, concat_ws, col
+
+# Group by pub_date and select the first value for each group
+result_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy("pub_date").agg(
+    first("TotalSentences").alias("TotalSentences"),
+    first("numPositv").alias("numPositv"),
+    first("numNegative").alias("numNegative"),
+    first("numNeutral").alias("numNeutral"),
+    first("AVGsentiment").alias("AVGsentiment"),
+    concat_ws("\n", collect_list("abstract")).alias("abstract"),
+    concat_ws("\n", collect_list("snippet")).alias("snippet"),
+    concat_ws("\n", collect_list("lead_paragraph")).alias("lead_paragraph"),
+    concat_ws("\n", collect_list("source")).alias("source"),
+    concat_ws("\n", collect_list("document_type")).alias("document_type"),
+    concat_ws("\n", collect_list("section_name")).alias("section_name"),
+    concat_ws("\n", collect_list("uri")).alias("uri")
+)
+
+# Show the results
+result_nyt_final_with_additional_data_grouped.limit(1).show(truncate=True)
+
+
+
+%pyspark
+from pyspark.sql.functions import first, concat, lit, col
+
+# Group by pub_date and select the first value for each group
+result_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy("pub_date").agg(
+    first("TotalSentences").alias("TotalSentences"),
+    first("numPositv").alias("numPositv"),
+    first("numNegative").alias("numNegative"),
+    first("numNeutral").alias("numNeutral"),
+    first("AVGsentiment").alias("AVGsentiment"),
+    concat(collect_list(concat(col("abstract"), lit("\n")))).alias("abstract"),
+    concat(collect_list(concat(col("snippet"), lit("\n")))).alias("snippet"),
+    concat(collect_list(concat(col("lead_paragraph"), lit("\n")))).alias("lead_paragraph"),
+    concat(collect_list(concat(col("source"), lit("\n")))).alias("source"),
+    concat(collect_list(concat(col("document_type"), lit("\n")))).alias("document_type"),
+    concat(collect_list(concat(col("section_name"), lit("\n")))).alias("section_name"),
+    concat(collect_list(concat(col("uri"), lit("\n")))).alias("uri")
+)
+
+# Show the results
+result_nyt_final_with_additional_data_grouped.limit(1).show(truncate=True)
+
+
+
+%pyspark
+from pyspark.sql.functions import first, collect_list, concat_ws
+
+# Group by pub_date and select the first value for each group
+result_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy("pub_date").agg(
+    first("TotalSentences").alias("TotalSentences"),
+    first("numPositv").alias("numPositv"),
+    first("numNegative").alias("numNegative"),
+    first("numNeutral").alias("numNeutral"),
+    first("AVGsentiment").alias("AVGsentiment"),
+    concat_ws(" | ", collect_list("abstract")).alias("abstract"),
+    concat_ws(" | ", collect_list("snippet")).alias("snippet"),
+    concat_ws(" | ", collect_list("lead_paragraph")).alias("lead_paragraph"),
+    concat_ws(" | ", collect_list("source")).alias("source"),
+    concat_ws(" | ", collect_list("document_type")).alias("document_type"),
+    concat_ws(" | ", collect_list("section_name")).alias("section_name"),
+    concat_ws(" | ", collect_list("uri")).alias("uri")
+)
+
+# Show the results
+result_nyt_final_with_additional_data_grouped.limit(3).show(truncate=True)
+

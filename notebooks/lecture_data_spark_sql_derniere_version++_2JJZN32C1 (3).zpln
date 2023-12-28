@@ -1,0 +1,969 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nspark = SparkSession.builder.appName(\"SentimentAnalysis\").getOrCreate()",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:02:16+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702920876075_1982971496",
+      "id": "paragraph_1702920876075_1982971496",
+      "dateCreated": "2023-12-18T17:34:36+0000",
+      "dateStarted": "2023-12-21T16:02:16+0000",
+      "dateFinished": "2023-12-21T16:03:22+0000",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:617"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nfrom pyspark.sql.functions import col\n\n# Initialize Spark session\nspark = SparkSession.builder.appName(\"parquetReading\").getOrCreate()\n\n# Define the path to Parquet files in HDFS\nnyt_path = \"hdfs://namenode:9000/user/inputs/nyt-00000-of-00001.parquet\"\nyahoo_path = \"hdfs://namenode:9000/user/inputs/yh-00000-of-00001.parquet\"\n\n# Read Parquet files into DataFrames\nnyt_df = spark.read.parquet(nyt_path)\n\n# Rename columns with invalid characters using aliases\nnyt_df = nyt_df.select(\n    col(\"abstract\"),\n    col(\"snippet\"),\n    col(\"lead_paragraph\"),\n    col(\"source\"),\n    col(\"pub_date\"),\n    col(\"document_type\"),\n    col(\"section_name\"),\n    col(\"type_of_material\"),\n    col(\"uri\"),\n)\n\n# Register DataFrames as temporary tables\nnyt_df.createOrReplaceTempView(\"nyt_data\")\n\n# Read Yahoo Finance Parquet file\nyahoo_df = spark.read.parquet(yahoo_path)\n\n# Rename columns with invalid characters using aliases\nyahoo_df = yahoo_df.select(\n    col(\"Date\"),\n    col(\"Open\"),\n    col(\"High\"),\n    col(\"Low\"),\n    col(\"Close\"),\n    col(\"Volume\")\n)\n\n# Register DataFrame as a temporary table\nyahoo_df.createOrReplaceTempView(\"yahoo_data\")\n\n# Perform Spark SQL queries to analyze or transform the data\nresult_nyt = spark.sql(\"\"\"\n    SELECT *\n    FROM nyt_data\n\"\"\")\n\nresult_yahoo = spark.sql(\"\"\"\n    SELECT *\n    FROM yahoo_data\n\"\"\")\n\n# Display the results\nresult_nyt.show()\nresult_yahoo.show()\n\n\n# spark.stop()\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-23T19:41:46+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 545.2,
+              "optionOpen": false
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+--------------------+--------------------+--------------------+------------------+--------------------+-------------+------------------+----------------+--------------------+\n|            abstract|             snippet|      lead_paragraph|            source|            pub_date|document_type|      section_name|type_of_material|                 uri|\n+--------------------+--------------------+--------------------+------------------+--------------------+-------------+------------------+----------------+--------------------+\n|Is this really ab...|Is this really ab...|Donald Trump hasn...|The New York Times|2023-12-01T00:00:...|      article|           Opinion|           Op-Ed|nyt://article/535...|\n|Prosecutors said ...|Prosecutors said ...|Six former correc...|The New York Times|2023-12-01T00:02:...|      article|              U.S.|            News|nyt://article/adb...|\n|A blueprint revie...|A blueprint revie...|Israeli officials...|The New York Times|2023-12-01T00:16:...|      article|             World|            News|nyt://article/427...|\n|TikTok, which is ...|TikTok, which is ...|A federal judge i...|The New York Times|2023-12-01T00:16:...|      article|      Business Day|            News|nyt://article/e31...|\n|In his decades in...|In his decades in...|Henry A. Kissinge...|The New York Times|2023-12-01T00:27:...|      article|              U.S.|            News|nyt://article/e2e...|\n|Christian Ziegler...|Christian Ziegler...|Florida’s Republi...|The New York Times|2023-12-01T00:34:...|      article|              U.S.|            News|nyt://article/b20...|\n|President Biden r...|President Biden r...|President Biden h...|The New York Times|2023-12-01T00:35:...|      article|              U.S.|            News|nyt://article/dd0...|\n|The superyacht, c...|The superyacht, c...|First, Jeff Bezos...|The New York Times|2023-12-01T00:51:...|      article|              U.S.|            News|nyt://article/077...|\n|The charges illus...|The charges illus...|On a rainy night ...|The New York Times|2023-12-01T00:54:...|      article|              U.S.|            News|nyt://article/ff0...|\n|Secretary of Stat...|Secretary of Stat...|As Hamas released...|The New York Times|2023-12-01T01:05:...|      article|             World|            News|nyt://article/aa6...|\n|Guy Philippe, who...|Guy Philippe, who...|Guy Philippe, the...|The New York Times|2023-12-01T01:24:...|      article|             World|            News|nyt://article/afb...|\n|For Mr. DeSantis,...|For Mr. DeSantis,...|Gov. Ron DeSantis...|The New York Times|2023-12-01T01:31:...|      article|              U.S.|            News|nyt://article/dbc...|\n|Quintus Chen, of ...|Quintus Chen, of ...|A 3-year-old boy ...|The New York Times|2023-12-01T01:59:...|      article|          New York|            News|nyt://article/51e...|\n|Jen Silverman’s n...|Jen Silverman’s n...|“Financing is com...|The New York Times|2023-12-01T02:00:...|      article|           Theater|          Review|nyt://article/aeb...|\n|After receiving t...|After receiving t...|The debut season ...|The New York Times|2023-12-01T02:40:...|      article|             Style|            News|nyt://article/a3e...|\n|Jem Burch gives s...|Jem Burch gives s...|Jump to: Tricky C...|The New York Times|2023-12-01T03:00:...|      article|Crosswords & Games|            News|nyt://article/95d...|\n|David Balton and ...|David Balton and ...|ACROSTIC — Today’...|The New York Times|2023-12-01T03:02:...|      article|Crosswords & Games|            News|nyt://article/d5a...|\n|Earlier this mont...|Earlier this mont...|Earlier this mont...|The New York Times|2023-12-01T03:33:...|   multimedia|              U.S.|           Video|nyt://video/0c57d...|\n|Met officials wer...|Met officials wer...|The opening night...|The New York Times|2023-12-01T04:09:...|      article|              Arts|            News|nyt://article/c9a...|\n|Ron DeSantis show...|Ron DeSantis show...|For an hour and a...|The New York Times|2023-12-01T04:47:...|      article|              U.S.|            News|nyt://article/b9e...|\n+--------------------+--------------------+--------------------+------------------+--------------------+-------------+------------------+----------------+--------------------+\nonly showing top 20 rows\n\n+----------+------------------+------------------+------------------+------------------+----------+\n|      Date|              Open|              High|               Low|             Close|    Volume|\n+----------+------------------+------------------+------------------+------------------+----------+\n|2023-01-03|130.27999877929688|130.89999389648438|124.16999816894531|125.06999969482422|1.121175E8|\n|2023-01-04|126.88999938964844|128.66000366210938|125.08000183105469|126.36000061035156| 8.91136E7|\n|2023-01-05|127.12999725341797| 127.7699966430664|124.76000213623047| 125.0199966430664| 8.09627E7|\n|2023-01-06|126.01000213623047| 130.2899932861328|124.88999938964844| 129.6199951171875| 8.77547E7|\n|2023-01-09|130.47000122070312|133.41000366210938|129.88999938964844|130.14999389648438| 7.07908E7|\n|2023-01-10|130.25999450683594|131.25999450683594| 128.1199951171875|130.72999572753906| 6.38962E7|\n|2023-01-11|            131.25|133.50999450683594| 130.4600067138672|133.49000549316406| 6.94589E7|\n|2023-01-12| 133.8800048828125|134.25999450683594|131.44000244140625|133.41000366210938| 7.13796E7|\n|2023-01-13|132.02999877929688| 134.9199981689453|131.66000366210938|134.75999450683594| 5.78097E7|\n|2023-01-17| 134.8300018310547| 137.2899932861328| 134.1300048828125|135.94000244140625| 6.36466E7|\n|2023-01-18|136.82000732421875|138.61000061035156|135.02999877929688| 135.2100067138672| 6.96728E7|\n|2023-01-19| 134.0800018310547|            136.25|133.77000427246094|135.27000427246094| 5.82804E7|\n|2023-01-20|135.27999877929688|138.02000427246094|134.22000122070312| 137.8699951171875| 8.02236E7|\n|2023-01-23| 138.1199951171875|143.32000732421875|137.89999389648438|141.11000061035156| 8.17603E7|\n|2023-01-24|140.30999755859375|143.16000366210938| 140.3000030517578|142.52999877929688| 6.64351E7|\n|2023-01-25|140.88999938964844|142.42999267578125|138.80999755859375|141.86000061035156| 6.57993E7|\n|2023-01-26| 143.1699981689453|            144.25|141.89999389648438| 143.9600067138672| 5.41051E7|\n|2023-01-27|143.16000366210938|147.22999572753906| 143.0800018310547|145.92999267578125| 7.05558E7|\n|2023-01-30| 144.9600067138672| 145.5500030517578|142.85000610351562|             143.0| 6.40153E7|\n|2023-01-31| 142.6999969482422|144.33999633789062|142.27999877929688| 144.2899932861328| 6.58745E7|\n+----------+------------------+------------------+------------------+------------------+----------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=0",
+              "$$hashKey": "object:1145"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=1",
+              "$$hashKey": "object:1146"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=2",
+              "$$hashKey": "object:1147"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=3",
+              "$$hashKey": "object:1148"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702920895494_203407440",
+      "id": "paragraph_1702920895494_203407440",
+      "dateCreated": "2023-12-18T17:34:55+0000",
+      "dateStarted": "2023-12-21T16:03:37+0000",
+      "dateFinished": "2023-12-21T16:03:58+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:618"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.ml import PipelineModel\nhdfs_model_path = \"hdfs://namenode:9000/user/best_model\"\nloaded_model = PipelineModel.load(hdfs_model_path)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:04:11+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=4",
+              "$$hashKey": "object:1206"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=5",
+              "$$hashKey": "object:1207"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=6",
+              "$$hashKey": "object:1208"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=7",
+              "$$hashKey": "object:1209"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=8",
+              "$$hashKey": "object:1210"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=9",
+              "$$hashKey": "object:1211"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=10",
+              "$$hashKey": "object:1212"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=11",
+              "$$hashKey": "object:1213"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=12",
+              "$$hashKey": "object:1214"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=13",
+              "$$hashKey": "object:1215"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=14",
+              "$$hashKey": "object:1216"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=15",
+              "$$hashKey": "object:1217"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=16",
+              "$$hashKey": "object:1218"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=17",
+              "$$hashKey": "object:1219"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=18",
+              "$$hashKey": "object:1220"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=19",
+              "$$hashKey": "object:1221"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=20",
+              "$$hashKey": "object:1222"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=21",
+              "$$hashKey": "object:1223"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=22",
+              "$$hashKey": "object:1224"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=23",
+              "$$hashKey": "object:1225"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702921431046_126933963",
+      "id": "paragraph_1702921431046_126933963",
+      "dateCreated": "2023-12-18T17:43:51+0000",
+      "dateStarted": "2023-12-21T16:04:11+0000",
+      "dateFinished": "2023-12-21T16:04:42+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:619"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nfrom pyspark.ml import PipelineModel\nfrom pyspark.sql.functions import col, udf, length, when\nfrom pyspark.sql.types import StringType\n\n# Assuming SparkSession is already created\n# If not, create it using SparkSession.builder.appName(\"YourAppName\").getOrCreate()\n\n# Select the relevant column for prediction\ntext_column = \"abstract\"\nnyt_text_data = result_nyt.select(col(text_column).alias(\"Sentence\"))\n\n# Define a UDF to map sentiment labels\nmap_sentiment_label_udf = udf(lambda prediction: 'positive' if prediction == 0.0 else ('negative' if prediction == 1.0 else 'neutral'), StringType())\n\n# Apply the loaded model to predict sentiment scores\nnyt_sentiment_result = loaded_model.transform(nyt_text_data)\n\n# Filter out rows where \"Sentence\" is not null\nnyt_sentiment_result = nyt_sentiment_result.filter(col(\"Sentence\").isNotNull())\n\n\n# Extract the first 7 words of each sentence\nnyt_sentiment_result = nyt_sentiment_result.withColumn(\"Truncated_Sentence\", when((length(\"Sentence\") > 157) & (col(\"Sentence\") != \"\") , col(\"Sentence\").substr(1, 17) + \"...\").otherwise(col(\"Sentence\")))\n\n\n# Select relevant columns for display\nnyt_sentiment_result = nyt_sentiment_result.select(\"Truncated_Sentence\", \"prediction\") \\\n    .withColumnRenamed(\"prediction\", \"Sentiment\")\n\n# Apply the UDF to create a new column with sentiment labels\nnyt_sentiment_result = nyt_sentiment_result.withColumn(\"Sentiment_Label\", map_sentiment_label_udf(col(\"Sentiment\")))\n\n\n# Show the truncated results\nnyt_sentiment_result.select(\"Truncated_Sentence\", \"Sentiment\", \"Sentiment_Label\").limit(7).show(truncate=False)\n\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:13:32+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-----------------------------------------------------------------------------------------------------------------------------------------------------------+---------+---------------+\n|Truncated_Sentence                                                                                                                                         |Sentiment|Sentiment_Label|\n+-----------------------------------------------------------------------------------------------------------------------------------------------------------+---------+---------------+\n|Is this really about policy, or is it personal?                                                                                                            |1.0      |negative       |\n|Prosecutors said the former corrections officers had made false statements to investigators after three of them assaulted Quantez Burks, 37, in March 2022.|0.0      |positive       |\n|A blueprint reviewed by The Times laid out the attack in detail. Israeli officials dismissed it as aspirational and ignored specific warnings.             |0.0      |positive       |\n|TikTok, which is owned by the Chinese company ByteDance, has been locked in a legal battle with Montana since the state passed the ban in April.           |1.0      |negative       |\n|In his decades in politics, the statesman advised many presidents. Here are some of their thoughts from over the years, in their own words.                |1.0      |negative       |\n|Christian Ziegler, the state G.O.P. chairman, is under investigation after a sexual battery allegation. Democrats have called for his resignation.         |1.0      |negative       |\n|President Biden recommitted to a promise to invest in the continent, as the United States has lagged behind Russia and China in competing for influence.   |0.0      |positive       |\n+-----------------------------------------------------------------------------------------------------------------------------------------------------------+---------+---------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=65",
+              "$$hashKey": "object:1347"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=66",
+              "$$hashKey": "object:1348"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702921372653_1570765993",
+      "id": "paragraph_1702921372653_1570765993",
+      "dateCreated": "2023-12-18T17:42:52+0000",
+      "dateStarted": "2023-12-21T16:13:32+0000",
+      "dateFinished": "2023-12-21T16:13:33+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:620"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nfrom pyspark.ml import PipelineModel\nfrom pyspark.sql.functions import col, udf\nfrom pyspark.sql.types import StringType\n\n# Assuming loaded_model is already loaded\n\n# Select the relevant column for prediction\ntext_column = \"abstract\"\nresult_nyt_text_data = result_nyt.select(col(text_column).alias(\"Sentence\"))\n\n# Define a UDF to map sentiment labels\nmap_sentiment_label_udf = udf(lambda prediction: 'positive' if prediction == 0.0 else ('negative' if prediction == 1.0 else 'neutral'), StringType())\n\n# Apply the loaded model to predict sentiment scores\nresult_nyt_sentiment = loaded_model.transform(result_nyt_text_data)\n\n# Select relevant columns for display\nresult_nyt_sentiment = result_nyt_sentiment.select(\"Sentence\", \"prediction\").withColumnRenamed(\"prediction\", \"Sentiment\")\n\n# Apply the UDF to create a new column with sentiment labels\nresult_nyt_sentiment = result_nyt_sentiment.withColumn(\"Sentiment_Label\", map_sentiment_label_udf(col(\"Sentiment\")))",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:13:51+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702921440387_435709135",
+      "id": "paragraph_1702921440387_435709135",
+      "dateCreated": "2023-12-18T17:44:00+0000",
+      "dateStarted": "2023-12-21T16:13:51+0000",
+      "dateFinished": "2023-12-21T16:13:51+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:621"
+    },
+    {
+      "text": "%pyspark\r\nfrom pyspark.ml import PipelineModel\r\nfrom pyspark.sql import SparkSession\r\nfrom pyspark.sql.functions import col, udf, avg, sum\r\nfrom pyspark.sql.types import IntegerType\r\n\r\n# Initialize Spark session\r\nspark = SparkSession.builder.appName(\"SentimentAnalysis\").getOrCreate()\r\n\r\n# Load the pre-trained sentiment analysis model\r\nloaded_model_path = \"hdfs://namenode:9000/user/best_model\" \r\nloaded_model = PipelineModel.load(loaded_model_path)\r\n\r\n# Select the relevant column for prediction\r\ntext_column = \"abstract\"\r\nresult_nyt_text_data = result_nyt.select(col(text_column).alias(\"Sentence\"), \"pub_date\")\r\n\r\n# Apply the loaded model to predict sentiment scores\r\nresult_nyt_sentiment = loaded_model.transform(result_nyt_text_data)\r\n\r\n# Define a UDF to map sentiment labels\r\nmap_sentiment_label_udf = udf(lambda prediction: 1 if prediction == 0.0 else (-1 if prediction == 1.0 else 0), IntegerType())\r\n\r\n# Apply the UDF to create a new column with sentiment labels\r\nresult_nyt_sentiment = result_nyt_sentiment.withColumn(\"Sentiment_Label\", map_sentiment_label_udf(col(\"prediction\")))\r\n\r\n# Calculate the average sentiment, numPositv, and numNegative for each day\r\nresult_nyt_avg_sentiment = result_nyt_sentiment.groupBy(\"pub_date\").agg(\r\n    avg(\"Sentiment_Label\").alias(\"AVGsentiment\"),\r\n    sum(col(\"Sentiment_Label\").cast(IntegerType())).alias(\"numPositv\"),\r\n    sum((col(\"Sentiment_Label\") * -1).cast(IntegerType())).alias(\"numNegative\")\r\n)\r\n\r\n# Show the results\r\n# result_nyt_avg_sentiment.show(truncate=False)\r\n\r\n# Stop the Spark session\r\n# spark.stop()\r\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-28T00:21:05+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702946112667_1668735126",
+      "id": "paragraph_1702946112667_1668735126",
+      "dateCreated": "2023-12-19T00:35:12+0000",
+      "dateStarted": "2023-12-21T16:13:55+0000",
+      "dateFinished": "2023-12-21T16:14:03+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:622"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nfrom pyspark.sql.functions import col, udf, length, when, date_format, sum ,format_number,count\nfrom pyspark.sql.types import StringType\n\n# Assuming SparkSession is already created\n# If not, create it using SparkSession.builder.appName(\"YourAppName\").getOrCreate()\n\n# Define a UDF to map sentiment labels\nmap_sentiment_label_udf = udf(lambda prediction: 'positive' if prediction == 0.0 else ('negative' if prediction == 1.0 else 'neutral'), StringType())\n\n# Assuming you have a DataFrame with sentiment labels named result_nyt_sentiment\n\n# Extract the first 7 words of each sentence\nresult_nyt_sentiment = result_nyt_sentiment.withColumn(\"Truncated_Sentence\", when((length(\"Sentence\") > 107) & (col(\"Sentence\") != \"\"), col(\"Sentence\").substr(1, 7) + \"...\").otherwise(col(\"Sentence\")))\n\n# Calculate the total number of sentences for each day\nresult_nyt_count_sentences = result_nyt_sentiment.groupBy(date_format(\"pub_date\", \"yyyy-MM-dd\").alias(\"pub_date\"), \"Truncated_Sentence\").agg(count(\"*\").alias(\"TotalSentences\"))\n\n# Add Truncated_Sentence column to result_nyt_avg_sentiment DataFrame\nresult_nyt_avg_sentiment = result_nyt_sentiment.groupBy(date_format(\"pub_date\", \"yyyy-MM-dd\").alias(\"pub_date\"), \"Truncated_Sentence\").agg(\n    avg(\"Sentiment_Label\").alias(\"AVGsentiment\"),\n    sum(when(col(\"Sentiment_Label\") == 1, 1).otherwise(0)).alias(\"numPositv\"),\n    sum(when(col(\"Sentiment_Label\") == 0, 1).otherwise(0)).alias(\"numNegative\")\n)\n\n# Join the average sentiment DataFrame with the total count DataFrame\nresult_nyt_final = result_nyt_avg_sentiment.join(\n    result_nyt_count_sentences,\n    [\"pub_date\", \"Truncated_Sentence\"],\n    \"left_outer\"\n).select(\n    \"pub_date\",\n    \"Truncated_Sentence\",\n    \"AVGsentiment\",\n    \"TotalSentences\",\n    \"numPositv\",\n    \"numNegative\"\n)\n\nresult_nyt_summary = result_nyt_sentiment.groupBy(date_format(\"pub_date\", \"yyyy-MM-dd\").alias(\"pub_date\")).agg(\n    count(\"*\").alias(\"TotalSentences\"),\n    sum(when(col(\"Sentiment_Label\") == 1, 1).otherwise(0)).alias(\"numPositv\"),\n    sum(when(col(\"Sentiment_Label\") == 0, 1).otherwise(0)).alias(\"numNegative\"),\n    sum(when((col(\"Sentiment_Label\") != 0.0) & (col(\"Sentiment_Label\") != 1.0), 1).otherwise(0)).alias(\"numNeutral\"),\n   \n)\n# Calculate the average sentiment\nresult_nyt_summary = result_nyt_summary.withColumn(\n    \"AVGsentiment\",\n    format_number((col(\"numNegative\") + col(\"numPositv\")) / col(\"TotalSentences\"),2)\n)\n\n# Sort the DataFrame by date\nresult_nyt_summary = result_nyt_summary.orderBy(\"pub_date\")\n\n# Show the results\nresult_nyt_summary.show(truncate=False)\n\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:14:13+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+\n|pub_date  |TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|\n+----------+--------------+---------+-----------+----------+------------+\n|2023-12-01|194           |85       |4          |105       |0.46        |\n|2023-12-02|90            |44       |0          |46        |0.49        |\n|2023-12-03|64            |30       |1          |33        |0.48        |\n|2023-12-04|102           |40       |1          |61        |0.40        |\n|2023-12-05|170           |80       |0          |90        |0.47        |\n|2023-12-06|163           |72       |1          |90        |0.45        |\n|2023-12-07|187           |88       |5          |94        |0.50        |\n|2023-12-08|161           |70       |2          |89        |0.45        |\n|2023-12-09|82            |39       |0          |43        |0.48        |\n|2023-12-10|70            |35       |2          |33        |0.53        |\n|2023-12-11|129           |59       |4          |66        |0.49        |\n|2023-12-12|154           |73       |1          |80        |0.48        |\n|2023-12-13|139           |66       |4          |69        |0.50        |\n|2023-12-14|158           |79       |2          |77        |0.51        |\n|2023-12-15|160           |85       |0          |75        |0.53        |\n|2023-12-16|74            |33       |1          |40        |0.46        |\n|2023-12-17|58            |28       |0          |30        |0.48        |\n|2023-12-18|22            |11       |0          |11        |0.50        |\n+----------+--------------+---------+-----------+----------+------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=89",
+              "$$hashKey": "object:1589"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=90",
+              "$$hashKey": "object:1590"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702930583284_1781504030",
+      "id": "paragraph_1702930583284_1781504030",
+      "dateCreated": "2023-12-18T20:16:23+0000",
+      "dateStarted": "2023-12-21T16:14:13+0000",
+      "dateFinished": "2023-12-21T16:14:15+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:623"
+    },
+    {
+      "text": "%pyspark\n# Add the provided data to result_nyt\n# additional_data = spark.sql(\"\"\"\n#     SELECT *\n#     FROM nyt_data\n# \"\"\")\n\nadditional_data = spark.sql(\"\"\"\n    SELECT abstract,snippet,lead_paragraph,source,date_format(pub_date, 'yyyy-MM-dd') as pub_date,document_type,section_name,uri\n    FROM nyt_data\n\"\"\")\n\n\n\n# # Show the results\n# additional_data.show(truncate=False)\n\n\n# Join based on \"pub_date\" only\nresult_nyt_final_with_additional_data = result_nyt_summary.join(\n    additional_data.select(\"pub_date\", \"abstract\", \"snippet\", \"lead_paragraph\", \"source\", \"document_type\", \"section_name\", \"uri\"),\n    \"pub_date\",\n    \"left_outer\"\n)\n\n# Show the results\nresult_nyt_final_with_additional_data.show(truncate=True)\nhdfs_path_csv = \"hdfs://namenode:9000/user/nvDataFrame.csv\"\n# hdfs_path_csv = \"/opt/zeppelin/nvDataFrame2.csv\"\n# Save DataFrame to HDFS in CSV format\nresult_nyt_final_with_additional_data_grouped.write.csv(hdfs_path_csv, mode=\"overwrite\", header=True)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T17:03:28+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+------------------+-------------+------------+--------------------+\n|  pub_date|TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|            abstract|             snippet|      lead_paragraph|            source|document_type|section_name|                 uri|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+------------------+-------------+------------+--------------------+\n|2023-12-01|           194|       85|          4|       105|        0.46|The Heritage Foun...|The Heritage Foun...|An influential co...|The New York Times|      article|        U.S.|nyt://article/91b...|\n|2023-12-01|           194|       85|          4|       105|        0.46|The Heritage Foun...|The Heritage Foun...|The Heritage Foun...|The New York Times|   multimedia|        U.S.|nyt://interactive...|\n|2023-12-01|           194|       85|          4|       105|        0.46|The music mogul h...|The music mogul h...|A few months ago,...|The New York Times|      article|        Arts|nyt://article/4d1...|\n|2023-12-01|           194|       85|          4|       105|        0.46|John Turscak, 52,...|John Turscak, 52,...|An inmate stabbed...|The New York Times|      article|        U.S.|nyt://article/37a...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Going without med...|Going without med...|Nurit Cooper, 79,...|The New York Times|      article|       World|nyt://article/987...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Also, George Sant...|Also, George Sant...|A weeklong cease-...|The New York Times|      article|    Briefing|nyt://article/25f...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Wiping out Hamas ...|Wiping out Hamas ...|As Israel debates...|The New York Times|      article|     Opinion|nyt://article/eab...|\n|2023-12-01|           194|       85|          4|       105|        0.46|The New York Time...|The New York Time...|The New York Time...|The New York Times|   multimedia|  Obituaries|nyt://video/a3d49...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Justice O’Connor ...|Justice O’Connor ...|Sandra Day O’Conn...|The New York Times|      article|     Opinion|nyt://article/360...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Can you sort 8 hi...|Can you sort 8 hi...|Can you sort 8 hi...|The New York Times|   multimedia|  The Upshot|nyt://interactive...|\n|2023-12-01|           194|       85|          4|       105|        0.46|House Republicans...|House Republicans...|House Republicans...|The New York Times|      article|        U.S.|nyt://article/c97...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Israel has releas...|Israel has releas...|Israel released a...|The New York Times|      article|       World|nyt://article/1d6...|\n|2023-12-01|           194|       85|          4|       105|        0.46|The police are de...|The police are de...|The Los Angeles p...|The New York Times|      article|        U.S.|nyt://article/1ba...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Meet Progressive’...|Meet Progressive’...|               _____|The New York Times|      article|    New York|nyt://article/469...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Two researchers w...|Two researchers w...|Five years ago, t...|The New York Times|      article|      Health|nyt://article/45a...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Gov. Greg Abbott’...|Gov. Greg Abbott’...|A federal appeals...|The New York Times|      article|        U.S.|nyt://article/3e6...|\n|2023-12-01|           194|       85|          4|       105|        0.46|300 volunteers (i...|300 volunteers (i...|The 300 volunteer...|The New York Times|      article|        U.S.|nyt://article/e7e...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Not all oysters a...|Not all oysters a...|Not all oysters a...|The New York Times|   multimedia|    New York|nyt://interactive...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Plus: fringe acce...|Plus: fringe acce...|Alexandre Chapell...|The New York Times|      article|  T Magazine|nyt://article/940...|\n|2023-12-01|           194|       85|          4|       105|        0.46|Maximilian Davis,...|Maximilian Davis,...|Less than a week ...|The New York Times|      article|  T Magazine|nyt://article/39a...|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+------------------+-------------+------------+--------------------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=142",
+              "$$hashKey": "object:1640"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=144",
+              "$$hashKey": "object:1641"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=145",
+              "$$hashKey": "object:1642"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=146",
+              "$$hashKey": "object:1643"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=148",
+              "$$hashKey": "object:1644"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=149",
+              "$$hashKey": "object:1645"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702936328518_495101316",
+      "id": "paragraph_1702936328518_495101316",
+      "dateCreated": "2023-12-18T21:52:08+0000",
+      "dateStarted": "2023-12-21T17:03:28+0000",
+      "dateFinished": "2023-12-21T17:03:33+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:624"
+    },
+    {
+      "text": "%pyspark\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-19T01:23:21+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702948961604_237415495",
+      "id": "paragraph_1702948961604_237415495",
+      "dateCreated": "2023-12-19T01:22:41+0000",
+      "dateStarted": "2023-12-19T01:23:21+0000",
+      "dateFinished": "2023-12-19T01:23:21+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:625"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.functions import first\n\n# Group by pub_date and select the first value for each group\nresult_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy(\"pub_date\").agg(\n    first(\"TotalSentences\").alias(\"TotalSentences\"),\n    first(\"numPositv\").alias(\"numPositv\"),\n    first(\"numNegative\").alias(\"numNegative\"),\n    first(\"numNeutral\").alias(\"numNeutral\"),\n    first(\"AVGsentiment\").alias(\"AVGsentiment\"),\n    first(\"abstract\").alias(\"abstract\"),\n    first(\"snippet\").alias(\"snippet\"),\n    first(\"lead_paragraph\").alias(\"lead_paragraph\"),\n    first(\"source\").alias(\"source\"),\n    first(\"document_type\").alias(\"document_type\"),\n    first(\"section_name\").alias(\"section_name\"),\n    first(\"uri\").alias(\"uri\")\n)\n\n# Show the results\nresult_nyt_final_with_additional_data_grouped.show(truncate=True)\n# Specify the Druid configuration\n# druid_config = {\n#     \"url\": \"http://broker:8076\",  # Use the correct Druid broker URL (hostname may vary based on your setup)\n#     \"dataSource\": \"mydata_source\",  # Provide a Druid data source name\n#     # Other Druid configurations as needed\n# }\n\n\n# # Write DataFrame to Druid\n# # Write DataFrame to Druid\n# result_nyt_final_with_additional_data_grouped.write \\\n#     .option(\"zkurl\", \"zookeeper2:2182\") \\\n#     .option(\"uris\", \"http://broker:8076\") \\\n#     .options(**druid_config) \\\n#     .save()\n\n# Specify the HDFS path where you want to save the CSV file\nhdfs_path_csv = \"hdfs://namenode:9000/user/result.csv\"\n\n# Save DataFrame to HDFS in CSV format\nresult_nyt_final_with_additional_data_grouped.write.csv(hdfs_path_csv, mode=\"overwrite\", header=True)\n\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-23T19:43:12+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 465.2,
+              "optionOpen": false
+            }
+          },
+          "1": {
+            "graph": {
+              "mode": "table",
+              "height": 473.25,
+              "optionOpen": false
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+------------------+-------------+------------------+--------------------+\n|  pub_date|TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|            abstract|             snippet|      lead_paragraph|            source|document_type|      section_name|                 uri|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+------------------+-------------+------------------+--------------------+\n|2023-12-01|           194|       85|          4|       105|        0.46|The Heritage Foun...|The Heritage Foun...|An influential co...|The New York Times|      article|              U.S.|nyt://article/91b...|\n|2023-12-02|            90|       44|          0|        46|        0.49|Hostages who were...|Hostages who were...|Yelena Trupanob, ...|The New York Times|      article|             World|nyt://article/012...|\n|2023-12-03|            64|       30|          1|        33|        0.48|Sean Ziebarth let...|Sean Ziebarth let...|Jump to Today’s T...|The New York Times|      article|Crosswords & Games|nyt://article/8b0...|\n|2023-12-04|           102|       40|          1|        61|        0.40|Players will inve...|Players will inve...|There was finally...|The New York Times|      article|              Arts|nyt://article/194...|\n|2023-12-05|           170|       80|          0|        90|        0.47|While the preside...|While the preside...|For two months, P...|The New York Times|      article|              U.S.|nyt://article/67c...|\n|2023-12-06|           163|       72|          1|        90|        0.45|The Florida gover...|The Florida gover...|An undefeated col...|The New York Times|      article|              U.S.|nyt://article/fdc...|\n|2023-12-07|           187|       88|          5|        94|        0.50|The former N.B.A....|The former N.B.A....|Charles Barkley, ...|The New York Times|      article|              U.S.|nyt://article/28f...|\n|2023-12-08|           161|       70|          2|        89|        0.45|The Biden adminis...|The Biden adminis...|The Biden adminis...|The New York Times|      article|              U.S.|nyt://article/c8f...|\n|2023-12-09|            82|       39|          0|        43|        0.48|Decades after the...|Decades after the...|Decades after the...|The New York Times|   multimedia|             World|nyt://interactive...|\n|2023-12-10|            70|       35|          2|        33|        0.53|Luke K. Schreiber...|Luke K. Schreiber...|Jump to: Today’s ...|The New York Times|      article|Crosswords & Games|nyt://article/695...|\n|2023-12-11|           129|       59|          4|        66|        0.49|The wife of the L...|The wife of the L...|Glenys Kinnock, a...|The New York Times|      article|             World|nyt://article/927...|\n|2023-12-12|           154|       73|          1|        80|        0.48|About three-quart...|About three-quart...|The U.N. General ...|The New York Times|      article|             World|nyt://article/923...|\n|2023-12-13|           139|       66|          4|        69|        0.50|Also, the Fed for...|Also, the Fed for...|After two weeks o...|The New York Times|      article|          Briefing|nyt://article/49e...|\n|2023-12-14|           158|       79|          2|        77|        0.51|“Stranger Things:...|“Stranger Things:...|As theatergoers t...|The New York Times|      article|           Theater|nyt://article/0da...|\n|2023-12-15|           160|       85|          0|        75|        0.53|The former presid...|The former presid...|Gov. Ron DeSantis...|The New York Times|      article|              U.S.|nyt://article/859...|\n|2023-12-16|            74|       33|          1|        40|        0.46|Jeremy Newton’s p...|Jeremy Newton’s p...|Jump to: Tricky C...|The New York Times|      article|Crosswords & Games|nyt://article/b11...|\n|2023-12-17|            58|       28|          0|        30|        0.48|The Israeli milit...|The Israeli milit...|The tunnel in the...|The New York Times|      article|             World|nyt://article/4da...|\n|2023-12-18|            22|       11|          0|        11|        0.50|The New York City...|The New York City...|The City Council ...|The New York Times|      article|          New York|nyt://article/9b3...|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+------------------+-------------+------------------+--------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=96",
+              "$$hashKey": "object:1751"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=98",
+              "$$hashKey": "object:1752"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=99",
+              "$$hashKey": "object:1753"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=101",
+              "$$hashKey": "object:1754"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702932172595_2050405810",
+      "id": "paragraph_1702932172595_2050405810",
+      "dateCreated": "2023-12-18T20:42:52+0000",
+      "dateStarted": "2023-12-21T16:15:22+0000",
+      "dateFinished": "2023-12-21T16:15:30+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:626"
+    },
+    {
+      "text": "%pyspark\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-19T00:53:17+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702939321931_885110314",
+      "id": "paragraph_1702939321931_885110314",
+      "dateCreated": "2023-12-18T22:42:01+0000",
+      "dateStarted": "2023-12-19T00:53:17+0000",
+      "dateFinished": "2023-12-19T00:53:17+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:627"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.functions import first, collect_list\n\n# Group by pub_date and select the first value for each group\nresult_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy(\"pub_date\").agg(\n    first(\"TotalSentences\").alias(\"TotalSentences\"),\n    first(\"numPositv\").alias(\"numPositv\"),\n    first(\"numNegative\").alias(\"numNegative\"),\n    first(\"numNeutral\").alias(\"numNeutral\"),\n    first(\"AVGsentiment\").alias(\"AVGsentiment\"),\n    collect_list(\"abstract\").alias(\"abstract\"),\n    collect_list(\"snippet\").alias(\"snippet\"),\n    collect_list(\"lead_paragraph\").alias(\"lead_paragraph\"),\n    collect_list(\"source\").alias(\"source\"),\n    collect_list(\"document_type\").alias(\"document_type\"),\n    collect_list(\"section_name\").alias(\"section_name\"),\n    collect_list(\"uri\").alias(\"uri\")\n)\n\n# Show the results\n# result_nyt_final_with_additional_data_grouped.show(truncate=True)\nresult_nyt_final_with_additional_data_grouped.limit(3).show(truncate=True)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:15:30+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|  pub_date|TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|            abstract|             snippet|      lead_paragraph|              source|       document_type|        section_name|                 uri|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|2023-12-08|           161|       70|          2|        89|        0.45|[The Biden admini...|[The Biden admini...|[The Biden admini...|[The New York Tim...|[article, article...|[U.S., Internatio...|[nyt://article/c8...|\n|2023-12-17|            58|       28|          0|        30|        0.48|[The Israeli mili...|[The Israeli mili...|[The tunnel in th...|[The New York Tim...|[article, article...|[World, U.S., Cro...|[nyt://article/4d...|\n|2023-12-04|           102|       40|          1|        61|        0.40|[Players will inv...|[Players will inv...|[There was finall...|[The New York Tim...|[article, article...|[Arts, U.S., U.S....|[nyt://article/19...|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=102",
+              "$$hashKey": "object:1852"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=104",
+              "$$hashKey": "object:1853"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=105",
+              "$$hashKey": "object:1854"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702940569425_856740811",
+      "id": "paragraph_1702940569425_856740811",
+      "dateCreated": "2023-12-18T23:02:49+0000",
+      "dateStarted": "2023-12-21T16:15:30+0000",
+      "dateFinished": "2023-12-21T16:15:33+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:628"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.functions import first, concat_ws, col\n\n# Group by pub_date and select the first value for each group\nresult_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy(\"pub_date\").agg(\n    first(\"TotalSentences\").alias(\"TotalSentences\"),\n    first(\"numPositv\").alias(\"numPositv\"),\n    first(\"numNegative\").alias(\"numNegative\"),\n    first(\"numNeutral\").alias(\"numNeutral\"),\n    first(\"AVGsentiment\").alias(\"AVGsentiment\"),\n    concat_ws(\"\\n\", collect_list(\"abstract\")).alias(\"abstract\"),\n    concat_ws(\"\\n\", collect_list(\"snippet\")).alias(\"snippet\"),\n    concat_ws(\"\\n\", collect_list(\"lead_paragraph\")).alias(\"lead_paragraph\"),\n    concat_ws(\"\\n\", collect_list(\"source\")).alias(\"source\"),\n    concat_ws(\"\\n\", collect_list(\"document_type\")).alias(\"document_type\"),\n    concat_ws(\"\\n\", collect_list(\"section_name\")).alias(\"section_name\"),\n    concat_ws(\"\\n\", collect_list(\"uri\")).alias(\"uri\")\n)\n\n# Show the results\nresult_nyt_final_with_additional_data_grouped.limit(1).show(truncate=True)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:15:52+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|  pub_date|TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|            abstract|             snippet|      lead_paragraph|              source|       document_type|        section_name|                 uri|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|2023-12-08|           161|       70|          2|        89|        0.45|The Biden adminis...|The Biden adminis...|The Biden adminis...|The New York Time...|article\\narticle\\...|U.S.\\nInternation...|nyt://article/c8f...|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=107",
+              "$$hashKey": "object:1908"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=108",
+              "$$hashKey": "object:1909"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=109",
+              "$$hashKey": "object:1910"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702941349624_2001797303",
+      "id": "paragraph_1702941349624_2001797303",
+      "dateCreated": "2023-12-18T23:15:49+0000",
+      "dateStarted": "2023-12-21T16:15:52+0000",
+      "dateFinished": "2023-12-21T16:15:54+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:629"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.functions import first, concat, lit, col\n\n# Group by pub_date and select the first value for each group\nresult_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy(\"pub_date\").agg(\n    first(\"TotalSentences\").alias(\"TotalSentences\"),\n    first(\"numPositv\").alias(\"numPositv\"),\n    first(\"numNegative\").alias(\"numNegative\"),\n    first(\"numNeutral\").alias(\"numNeutral\"),\n    first(\"AVGsentiment\").alias(\"AVGsentiment\"),\n    concat(collect_list(concat(col(\"abstract\"), lit(\"\\n\")))).alias(\"abstract\"),\n    concat(collect_list(concat(col(\"snippet\"), lit(\"\\n\")))).alias(\"snippet\"),\n    concat(collect_list(concat(col(\"lead_paragraph\"), lit(\"\\n\")))).alias(\"lead_paragraph\"),\n    concat(collect_list(concat(col(\"source\"), lit(\"\\n\")))).alias(\"source\"),\n    concat(collect_list(concat(col(\"document_type\"), lit(\"\\n\")))).alias(\"document_type\"),\n    concat(collect_list(concat(col(\"section_name\"), lit(\"\\n\")))).alias(\"section_name\"),\n    concat(collect_list(concat(col(\"uri\"), lit(\"\\n\")))).alias(\"uri\")\n)\n\n# Show the results\nresult_nyt_final_with_additional_data_grouped.limit(1).show(truncate=True)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:16:03+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|  pub_date|TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|            abstract|             snippet|      lead_paragraph|              source|       document_type|        section_name|                 uri|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|2023-12-08|           161|       70|          2|        89|        0.45|[The Biden admini...|[The Biden admini...|[The Biden admini...|[The New York Tim...|[article\\n, artic...|[U.S.\\n, Internat...|[nyt://article/c8...|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=111",
+              "$$hashKey": "object:1964"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=112",
+              "$$hashKey": "object:1965"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=113",
+              "$$hashKey": "object:1966"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702941529182_1742834612",
+      "id": "paragraph_1702941529182_1742834612",
+      "dateCreated": "2023-12-18T23:18:49+0000",
+      "dateStarted": "2023-12-21T16:16:03+0000",
+      "dateFinished": "2023-12-21T16:16:06+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:630"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.functions import first, collect_list, concat_ws\n\n# Group by pub_date and select the first value for each group\nresult_nyt_final_with_additional_data_grouped = result_nyt_final_with_additional_data.groupBy(\"pub_date\").agg(\n    first(\"TotalSentences\").alias(\"TotalSentences\"),\n    first(\"numPositv\").alias(\"numPositv\"),\n    first(\"numNegative\").alias(\"numNegative\"),\n    first(\"numNeutral\").alias(\"numNeutral\"),\n    first(\"AVGsentiment\").alias(\"AVGsentiment\"),\n    concat_ws(\" | \", collect_list(\"abstract\")).alias(\"abstract\"),\n    concat_ws(\" | \", collect_list(\"snippet\")).alias(\"snippet\"),\n    concat_ws(\" | \", collect_list(\"lead_paragraph\")).alias(\"lead_paragraph\"),\n    concat_ws(\" | \", collect_list(\"source\")).alias(\"source\"),\n    concat_ws(\" | \", collect_list(\"document_type\")).alias(\"document_type\"),\n    concat_ws(\" | \", collect_list(\"section_name\")).alias(\"section_name\"),\n    concat_ws(\" | \", collect_list(\"uri\")).alias(\"uri\")\n)\n\n# Show the results\nresult_nyt_final_with_additional_data_grouped.limit(3).show(truncate=True)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-21T16:16:15+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|  pub_date|TotalSentences|numPositv|numNegative|numNeutral|AVGsentiment|            abstract|             snippet|      lead_paragraph|              source|       document_type|        section_name|                 uri|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n|2023-12-08|           161|       70|          2|        89|        0.45|The Biden adminis...|The Biden adminis...|The Biden adminis...|The New York Time...|article | article...|U.S. | Internatio...|nyt://article/c8f...|\n|2023-12-17|            58|       28|          0|        30|        0.48|The Israeli milit...|The Israeli milit...|The tunnel in the...|The New York Time...|article | article...|World | U.S. | Cr...|nyt://article/4da...|\n|2023-12-04|           102|       40|          1|        61|        0.40|Players will inve...|Players will inve...|There was finally...|The New York Time...|article | article...|Arts | U.S. | U.S...|nyt://article/194...|\n+----------+--------------+---------+-----------+----------+------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+--------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=115",
+              "$$hashKey": "object:2020"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=116",
+              "$$hashKey": "object:2021"
+            },
+            {
+              "jobUrl": "http://1b3fec49d16a:4040/jobs/job?id=117",
+              "$$hashKey": "object:2022"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702941762915_1750357331",
+      "id": "paragraph_1702941762915_1750357331",
+      "dateCreated": "2023-12-18T23:22:42+0000",
+      "dateStarted": "2023-12-21T16:16:15+0000",
+      "dateFinished": "2023-12-21T16:16:17+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:631"
+    },
+    {
+      "text": "",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-19T00:53:28+0000",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702928514686_258686282",
+      "id": "paragraph_1702928514686_258686282",
+      "dateCreated": "2023-12-18T19:41:54+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:632"
+    }
+  ],
+  "name": "lecture_data_spark_sql_derniere_version++",
+  "id": "2JJZN32C1",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.10.1",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/lecture_data_spark_sql_derniere_version++"
+}

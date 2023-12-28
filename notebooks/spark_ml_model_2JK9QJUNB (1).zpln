@@ -1,0 +1,1277 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nspark = SparkSession.builder.appName(\"SentimentAnalysis\").getOrCreate()",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:27:01+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529296_1153573794",
+      "id": "20231217-105529_325578945",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:27:01+0000",
+      "dateFinished": "2023-12-17T11:27:02+0000",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:2951"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nfrom pyspark.ml.classification import LogisticRegression, NaiveBayes, RandomForestClassifier\nfrom pyspark.ml import Pipeline\nfrom pyspark.ml.feature import Tokenizer, StopWordsRemover, CountVectorizer\nfrom pyspark.ml.evaluation import BinaryClassificationEvaluator\nfrom pyspark.ml.tuning import ParamGridBuilder, TrainValidationSplit\n\n# Initialiser la session Spark\nspark = SparkSession.builder.appName(\"SentimentAnalysis\").getOrCreate()\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:27:07+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529299_2047316341",
+      "id": "20231217-105529_331332187",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:27:07+0000",
+      "dateFinished": "2023-12-17T11:27:08+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2952"
+    },
+    {
+      "text": "%pyspark\n# Charger le dataset dans un DataFrame Spark\n# dataset_path= \"user/inputs/data.csv\"\ndataset_path = \"hdfs://namenode:9000/user/inputs/data.csv\"\ndf = spark.read.option(\"header\", \"true\").option(\"inferSchema\", \"true\").csv(dataset_path)",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:36:40+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=0",
+              "$$hashKey": "object:3501"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=1",
+              "$$hashKey": "object:3502"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529301_1343701766",
+      "id": "20231217-105529_1072865557",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:36:40+0000",
+      "dateFinished": "2023-12-17T11:36:55+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2953"
+    },
+    {
+      "text": "%pyspark\n# Prétraitement des données\ntokenizer = Tokenizer(inputCol=\"Sentence\", outputCol=\"words\")\nremover = StopWordsRemover(inputCol=\"words\", outputCol=\"filtered\")\nvectorizer = CountVectorizer(inputCol=\"filtered\", outputCol=\"features\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:37:30+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529302_655353948",
+      "id": "20231217-105529_232697905",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:37:30+0000",
+      "dateFinished": "2023-12-17T11:37:31+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2954"
+    },
+    {
+      "text": "%pyspark\n# Liste des modèles avec hyperparamètres\nmodels = [\n    (LogisticRegression, {\n        \"labelCol\": \"Sentiment\",  \n        \"featuresCol\": \"features\",\n        \"maxIter\": 10,\n        \"regParam\": 0.01\n    }),\n    (NaiveBayes, {\n        \"labelCol\": \"Sentiment\",  \n        \"featuresCol\": \"features\",\n        \"smoothing\": 1.0\n    }),\n    (RandomForestClassifier, {\n        \"labelCol\": \"Sentiment\",  \n        \"featuresCol\": \"features\",\n        \"numTrees\": 10,#50\n        \"maxDepth\": 5\n    })\n]\n\n# Diviser le dataset en ensembles d'entraînement et de test\ntrain_data, test_data = df.randomSplit([0.8, 0.2], seed=42)\ntrain_data = train_data.repartition(8) \ntest_data = test_data.repartition(8) ",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-23T11:22:34+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529302_199558376",
+      "id": "20231217-105529_1667088051",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:37:40+0000",
+      "dateFinished": "2023-12-17T11:37:40+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2955"
+    },
+    {
+      "text": "%pyspark\nprint(df.columns)",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:37:47+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "['Sentence', 'Sentiment']\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529302_865122025",
+      "id": "20231217-105529_1233998276",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:37:47+0000",
+      "dateFinished": "2023-12-17T11:37:47+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2956"
+    },
+    {
+      "text": "%pyspark\ndf.show(10)",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:37:51+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+--------------------+---------+\n|            Sentence|Sentiment|\n+--------------------+---------+\n|The GeoSolutions ...| positive|\n|$ESI on lows, dow...| negative|\n|For the last quar...| positive|\n|According to the ...|  neutral|\n|The Swedish buyou...|  neutral|\n|$SPY wouldn't be ...| positive|\n|Shell's $70 Billi...| negative|\n|SSH COMMUNICATION...| negative|\n|Kone 's net sales...| positive|\n|The Stockmann dep...|  neutral|\n+--------------------+---------+\nonly showing top 10 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=2",
+              "$$hashKey": "object:3700"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529303_1893820481",
+      "id": "20231217-105529_609743509",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:37:51+0000",
+      "dateFinished": "2023-12-17T11:37:51+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2957"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.ml.feature import Tokenizer, HashingTF, IDF, StringIndexer\nfrom pyspark.ml.classification import NaiveBayes, RandomForestClassifier\nfrom pyspark.ml import Pipeline\nfrom pyspark.ml.evaluation import MulticlassClassificationEvaluator\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:38:07+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529303_933940185",
+      "id": "20231217-105529_1381368861",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:38:07+0000",
+      "dateFinished": "2023-12-17T11:38:07+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2958"
+    },
+    {
+      "text": "%pyspark\n# Entraîner et évaluer les modèles\nbest_model = None\nbest_accuracy = 0.0\n\nfor model_class, param_grid in models:\n    # Créer le modèle\n    model = model_class()\n\n    # Créer le pipeline\n    tokenizer = Tokenizer(inputCol=\"Sentence\", outputCol=\"words\")\n    hashingTF = HashingTF(inputCol=\"words\", outputCol=\"rawFeatures\", numFeatures=50)\n    idf = IDF(inputCol=\"rawFeatures\", outputCol=\"features\")\n\n    indexer = StringIndexer(inputCol=\"Sentiment\", outputCol=\"label_indexed\")  # Use \"Sentiment\" instead of \"Sentence\"\n    classifier = model.setLabelCol(\"label_indexed\").setFeaturesCol(\"features\")\n\n    pipeline = Pipeline(stages=[tokenizer, hashingTF, idf, indexer, classifier])\n\n    print(f\"Training {model_class.__name__} model...\")\n    model_fit = pipeline.fit(train_data.sample(fraction=0.1, seed=42))\n    print(f\"{model_class.__name__} model trained successfully.\")\n\n    predictions = model_fit.transform(test_data.sample(fraction=0.1, seed=42))\n\n    evaluator = MulticlassClassificationEvaluator(labelCol=\"label_indexed\", predictionCol=\"prediction\", metricName=\"accuracy\")\n    accuracy = evaluator.evaluate(predictions)\n    print(f'{model_class.__name__} Accuracy: {accuracy}')\n\n    if accuracy > best_accuracy:\n        best_accuracy = accuracy\n        best_model = model_fit\n\nprint(f\"Best model with accuracy: {best_accuracy}\")",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:38:13+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Training LogisticRegression model...\nLogisticRegression model trained successfully.\nLogisticRegression Accuracy: 0.6229508196721312\nTraining NaiveBayes model...\nNaiveBayes model trained successfully.\nNaiveBayes Accuracy: 0.5409836065573771\nTraining RandomForestClassifier model...\nRandomForestClassifier model trained successfully.\nRandomForestClassifier Accuracy: 0.639344262295082\nBest model with accuracy: 0.639344262295082\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=5",
+              "$$hashKey": "object:3800"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=6",
+              "$$hashKey": "object:3801"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=7",
+              "$$hashKey": "object:3802"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=8",
+              "$$hashKey": "object:3803"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=9",
+              "$$hashKey": "object:3804"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=10",
+              "$$hashKey": "object:3805"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=11",
+              "$$hashKey": "object:3806"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=12",
+              "$$hashKey": "object:3807"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=13",
+              "$$hashKey": "object:3808"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=14",
+              "$$hashKey": "object:3809"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=15",
+              "$$hashKey": "object:3810"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=16",
+              "$$hashKey": "object:3811"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=17",
+              "$$hashKey": "object:3812"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=18",
+              "$$hashKey": "object:3813"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=19",
+              "$$hashKey": "object:3814"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=20",
+              "$$hashKey": "object:3815"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=21",
+              "$$hashKey": "object:3816"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=22",
+              "$$hashKey": "object:3817"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=23",
+              "$$hashKey": "object:3818"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=24",
+              "$$hashKey": "object:3819"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=25",
+              "$$hashKey": "object:3820"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=26",
+              "$$hashKey": "object:3821"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=27",
+              "$$hashKey": "object:3822"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=28",
+              "$$hashKey": "object:3823"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=29",
+              "$$hashKey": "object:3824"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=30",
+              "$$hashKey": "object:3825"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=31",
+              "$$hashKey": "object:3826"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=32",
+              "$$hashKey": "object:3827"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=33",
+              "$$hashKey": "object:3828"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=34",
+              "$$hashKey": "object:3829"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=35",
+              "$$hashKey": "object:3830"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=36",
+              "$$hashKey": "object:3831"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=37",
+              "$$hashKey": "object:3832"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=38",
+              "$$hashKey": "object:3833"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=39",
+              "$$hashKey": "object:3834"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=40",
+              "$$hashKey": "object:3835"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=41",
+              "$$hashKey": "object:3836"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=42",
+              "$$hashKey": "object:3837"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=43",
+              "$$hashKey": "object:3838"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=44",
+              "$$hashKey": "object:3839"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=45",
+              "$$hashKey": "object:3840"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=46",
+              "$$hashKey": "object:3841"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=47",
+              "$$hashKey": "object:3842"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=48",
+              "$$hashKey": "object:3843"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=49",
+              "$$hashKey": "object:3844"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=50",
+              "$$hashKey": "object:3845"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=51",
+              "$$hashKey": "object:3846"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=52",
+              "$$hashKey": "object:3847"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=53",
+              "$$hashKey": "object:3848"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=54",
+              "$$hashKey": "object:3849"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=55",
+              "$$hashKey": "object:3850"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=56",
+              "$$hashKey": "object:3851"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=57",
+              "$$hashKey": "object:3852"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=58",
+              "$$hashKey": "object:3853"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=59",
+              "$$hashKey": "object:3854"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=60",
+              "$$hashKey": "object:3855"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=61",
+              "$$hashKey": "object:3856"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=62",
+              "$$hashKey": "object:3857"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=63",
+              "$$hashKey": "object:3858"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=64",
+              "$$hashKey": "object:3859"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=65",
+              "$$hashKey": "object:3860"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=66",
+              "$$hashKey": "object:3861"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=67",
+              "$$hashKey": "object:3862"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=68",
+              "$$hashKey": "object:3863"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=69",
+              "$$hashKey": "object:3864"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=70",
+              "$$hashKey": "object:3865"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=71",
+              "$$hashKey": "object:3866"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=72",
+              "$$hashKey": "object:3867"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=73",
+              "$$hashKey": "object:3868"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=74",
+              "$$hashKey": "object:3869"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=75",
+              "$$hashKey": "object:3870"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=76",
+              "$$hashKey": "object:3871"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=77",
+              "$$hashKey": "object:3872"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=78",
+              "$$hashKey": "object:3873"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=79",
+              "$$hashKey": "object:3874"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=80",
+              "$$hashKey": "object:3875"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=81",
+              "$$hashKey": "object:3876"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=82",
+              "$$hashKey": "object:3877"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=83",
+              "$$hashKey": "object:3878"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=84",
+              "$$hashKey": "object:3879"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=85",
+              "$$hashKey": "object:3880"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529303_1014526300",
+      "id": "20231217-105529_1911979234",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:38:13+0000",
+      "dateFinished": "2023-12-17T11:39:08+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2959"
+    },
+    {
+      "text": "%pyspark\n# Save the best PySpark model\nbest_model_path = \"/opt/zeppelin\"\nbest_model.write().overwrite().save(best_model_path)\n\n# Print the path of the saved model\nprint(f\"Best PySpark model saved at: {best_model_path}\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:39:16+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Best PySpark model saved at: /opt/zeppelin\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=86",
+              "$$hashKey": "object:4258"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=87",
+              "$$hashKey": "object:4259"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=88",
+              "$$hashKey": "object:4260"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=89",
+              "$$hashKey": "object:4261"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=90",
+              "$$hashKey": "object:4262"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=91",
+              "$$hashKey": "object:4263"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=92",
+              "$$hashKey": "object:4264"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=93",
+              "$$hashKey": "object:4265"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=94",
+              "$$hashKey": "object:4266"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=95",
+              "$$hashKey": "object:4267"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=96",
+              "$$hashKey": "object:4268"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=97",
+              "$$hashKey": "object:4269"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=98",
+              "$$hashKey": "object:4270"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=99",
+              "$$hashKey": "object:4271"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529303_2007655353",
+      "id": "20231217-105529_1781463827",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:39:16+0000",
+      "dateFinished": "2023-12-17T11:39:22+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2960"
+    },
+    {
+      "text": "%pyspark\nhdfs_model_path = \"hdfs://namenode:9000/user/best_model\"\nbest_model.write().overwrite().save(hdfs_model_path)\n\n# Print the path of the saved model\nprint(f\"Best PySpark model saved at: {hdfs_model_path}\")",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:42:46+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Best PySpark model saved at: hdfs://namenode:9000/user/best_model\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=138",
+              "$$hashKey": "object:4381"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=139",
+              "$$hashKey": "object:4382"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=140",
+              "$$hashKey": "object:4383"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=141",
+              "$$hashKey": "object:4384"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=142",
+              "$$hashKey": "object:4385"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=143",
+              "$$hashKey": "object:4386"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=144",
+              "$$hashKey": "object:4387"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=145",
+              "$$hashKey": "object:4388"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=146",
+              "$$hashKey": "object:4389"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=147",
+              "$$hashKey": "object:4390"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=148",
+              "$$hashKey": "object:4391"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=149",
+              "$$hashKey": "object:4392"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=150",
+              "$$hashKey": "object:4393"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=151",
+              "$$hashKey": "object:4394"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529304_765111682",
+      "id": "20231217-105529_839790449",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:42:46+0000",
+      "dateFinished": "2023-12-17T11:42:48+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2961"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.ml import PipelineModel\nloaded_model = PipelineModel.load(hdfs_model_path)",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:42:49+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=152",
+              "$$hashKey": "object:4494"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=153",
+              "$$hashKey": "object:4495"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=154",
+              "$$hashKey": "object:4496"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=155",
+              "$$hashKey": "object:4497"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=156",
+              "$$hashKey": "object:4498"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=157",
+              "$$hashKey": "object:4499"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=158",
+              "$$hashKey": "object:4500"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=159",
+              "$$hashKey": "object:4501"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=160",
+              "$$hashKey": "object:4502"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=161",
+              "$$hashKey": "object:4503"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=162",
+              "$$hashKey": "object:4504"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=163",
+              "$$hashKey": "object:4505"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=164",
+              "$$hashKey": "object:4506"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=165",
+              "$$hashKey": "object:4507"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=166",
+              "$$hashKey": "object:4508"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=167",
+              "$$hashKey": "object:4509"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=168",
+              "$$hashKey": "object:4510"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=169",
+              "$$hashKey": "object:4511"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=170",
+              "$$hashKey": "object:4512"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=171",
+              "$$hashKey": "object:4513"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529304_853772582",
+      "id": "20231217-105529_1352315841",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:42:49+0000",
+      "dateFinished": "2023-12-17T11:42:52+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2962"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql import SparkSession\nfrom pyspark.sql.types import StringType, StructType, StructField\n\n# Create a Spark session\nspark = SparkSession.builder.appName(\"SentimentAnalysis\").getOrCreate()\n\n# Sample new data\ndata = [(\"This is a positive sentence.\",),\n        (\"Negative sentiment is not good.\",),\n        (\"I feel not happy today.\",),\n        (\"Sad news makes me unhappy.\",)]\n\n# Define the schema for the new data\nschema = StructType([StructField(\"Sentence\", StringType(), True)])\n\n# Create a DataFrame for new_data\nnew_data = spark.createDataFrame(data, schema=schema)\n\n# Show the new_data\nnew_data.show(truncate=False)\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:42:51+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------------------------------+\n|Sentence                       |\n+-------------------------------+\n|This is a positive sentence.   |\n|Negative sentiment is not good.|\n|I feel not happy today.        |\n|Sad news makes me unhappy.     |\n+-------------------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=172",
+              "$$hashKey": "object:4647"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=173",
+              "$$hashKey": "object:4648"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529305_1808586361",
+      "id": "20231217-105529_315216988",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:42:51+0000",
+      "dateFinished": "2023-12-17T11:42:52+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2963"
+    },
+    {
+      "text": "%pyspark\nfrom pyspark.sql.functions import udf\n# Make predictions on the new data\nnew_predictions = loaded_model.transform(new_data)\n\n# Define a function to map numeric predictions to sentiment labels\ndef map_sentiment_label(prediction):\n    if prediction == 0.0:\n        return 'positive'\n    elif prediction == 1.0:\n        return 'negative'\n    else:\n        return 'neutral'\n\n# Create a user-defined function (UDF) for the mapping function\nmap_sentiment_udf = udf(map_sentiment_label, StringType())\n\n# Apply the mapping function to the 'prediction' column and create a new column 'sentiment'\nnew_predictions = new_predictions.withColumn('sentiment', map_sentiment_udf(new_predictions['prediction']))\n\n# Select the relevant columns for display\nresult = new_predictions.select('Sentence', 'sentiment', 'probability')\n\n# Show the result\nresult.show(truncate=False)",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:42:54+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionSupport": true,
+          "completionKey": "TAB"
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+-------------------------------+---------+------------------------------------------------------------+\n|Sentence                       |sentiment|probability                                                 |\n+-------------------------------+---------+------------------------------------------------------------+\n|This is a positive sentence.   |positive |[0.5451254335541086,0.30616433123557263,0.1487102352103188] |\n|Negative sentiment is not good.|negative |[0.17383344460010064,0.5357608972499746,0.2904056581499248] |\n|I feel not happy today.        |negative |[0.1665846941764668,0.5430598386371346,0.29035546718639876] |\n|Sad news makes me unhappy.     |negative |[0.13223932301167857,0.5323029718444341,0.33545770514388734]|\n+-------------------------------+---------+------------------------------------------------------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=174",
+              "$$hashKey": "object:4710"
+            },
+            {
+              "jobUrl": "http://63c3ec067eee:4040/jobs/job?id=175",
+              "$$hashKey": "object:4711"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529305_606347332",
+      "id": "20231217-105529_262296437",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "dateStarted": "2023-12-17T11:42:54+0000",
+      "dateFinished": "2023-12-17T11:42:56+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:2964"
+    },
+    {
+      "text": "\n%pyspark\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T10:55:29+0000",
+      "progress": 0,
+      "config": {
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        }
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702810529305_1109694961",
+      "id": "20231217-105529_1284800599",
+      "dateCreated": "2023-12-17T10:55:29+0000",
+      "status": "READY",
+      "$$hashKey": "object:2965"
+    },
+    {
+      "text": "%pyspark\n",
+      "user": "anonymous",
+      "dateUpdated": "2023-12-17T11:45:56+0000",
+      "progress": 0,
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1702813556686_673373127",
+      "id": "paragraph_1702813556686_673373127",
+      "dateCreated": "2023-12-17T11:45:56+0000",
+      "status": "READY",
+      "$$hashKey": "object:2966"
+    }
+  ],
+  "name": "spark_ml_model",
+  "id": "2JK9QJUNB",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.10.1",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/spark_ml_model"
+}
